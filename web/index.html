@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AICHI BOOST</title>
+    <link id="theme-stylesheet" rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <style>
+        /* Восстановленные стили для кнопок в разделах "Система" и "Профили" */
+        .system-actions button,
+        .profile-controls button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+
+        .system-actions button:hover,
+        .profile-controls button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <main class="container">
+        <header class="title-bar">
+            <h1 data-lang="title">AICHI BOOST</h1>
+            <div class="theme-toggle">
+                <select id="theme-toggle">
+                    <option value="dark">Тёмная</option>
+                    <option value="light">Светлая</option>
+                </select>
+                <select id="language-select">
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </header>
+        <section class="performance-widget">
+            <p id="performance-score" data-lang="performance-score">Оценка производительности: 0</p>
+            <p id="performance-status">Проверка...</p>
+        </section>
+        <p id="status" data-lang="ready">Готово</p>
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="windows" data-lang="windows-tab">Windows</button>
+            <button class="tab-button" data-tab="performance" data-lang="performance-tab">Производительность</button>
+            <button class="tab-button" data-tab="visual" data-lang="visual-tab">Визуальные эффекты</button>
+            <button class="tab-button" data-tab="privacy" data-lang="privacy-tab">Конфиденциальность</button>
+            <button class="tab-button" data-tab="power" data-lang="power-tab">Питание</button>
+            <button class="tab-button" data-tab="autostart" data-lang="autostart-tab">Автозапуск</button>
+            <button class="tab-button" data-tab="system" data-lang="system-tab">Система</button>
+            <button class="tab-button" data-tab="profiles" data-lang="profiles-tab">Профили</button>
+        </nav>
+        <!-- Вкладка Windows -->
+        <section id="windows" class="tab-content active">
+            <h2 data-lang="windows">Windows</h2>
+            <p class="description" data-lang="windows-desc">Настройки операционной системы Windows.</p>
+            <div class="switches">
+                <label class="toggle-switch"><input type="checkbox" id="cortana" onchange="toggleCortana(this.checked)"><span class="switch"></span><span class="label" data-lang="cortana">Отключить Cortana</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="gameMode" onchange="toggleGameMode(this.checked)"><span class="switch"></span><span class="label" data-lang="gameMode">Игровой режим</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="gameBar" onchange="toggleGameBar(this.checked)"><span class="switch"></span><span class="label" data-lang="gameBar">Игровая панель</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="updates" onchange="toggleWindowsUpdate(this.checked)"><span class="switch"></span><span class="label" data-lang="updates">Обновления Windows</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="touch" onchange="toggleTouchInput(this.checked)"><span class="switch"></span><span class="label" data-lang="touch">Сенсорный ввод</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="clipboard" onchange="toggleCloudClipboard(this.checked)"><span class="switch"></span><span class="label" data-lang="clipboard">Облачный буфер</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="stickyKeys" onchange="toggleStickyKeys(this.checked)"><span class="switch"></span><span class="label" data-lang="stickyKeys">Залипание клавиш</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="menuDelay" onchange="toggleMenuDelay(this.checked)"><span class="switch"></span><span class="label" data-lang="menuDelay">Задержка меню</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="smartScreen" onchange="toggleSmartScreen(this.checked)"><span class="switch"></span><span class="label" data-lang="smartScreen">Smart Screen</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="mouseAcceleration" onchange="toggleMouseAcceleration(this.checked)"><span class="switch"></span><span class="label" data-lang="mouseAcceleration">Акселерация мыши</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="protectionNotifications" onchange="toggleProtectionNotifications(this.checked)"><span class="switch"></span><span class="label" data-lang="protectionNotifications">Уведомления защиты</span></label>
+            </div>
+        </section>
+        <!-- Вкладка Производительность -->
+        <section id="performance" class="tab-content">
+            <h2 data-lang="performance">Производительность</h2>
+            <p class="description" data-lang="performance-desc">Мониторинг использования ресурсов системы.</p>
+            <div class="charts">
+                <div class="chart-container">
+                    <p class="chart-label" data-lang="cpu-usage">Использование процессора</p>
+                    <canvas id="cpuChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <p class="chart-label" data-lang="ram-usage">Использование оперативной памяти</p>
+                    <canvas id="ramChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <p class="chart-label" data-lang="gpu-usage">Использование видеокарты</p>
+                    <canvas id="gpuChart"></canvas>
+                </div>
+            </div>
+            <div class="switches">
+                <label class="toggle-switch"><input type="checkbox" id="unnecessaryServices" onchange="toggleUnnecessaryServices(this.checked)"><span class="switch"></span><span class="label" data-lang="unnecessaryServices">Ненужные службы</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="driverAutoupdate" onchange="toggleDriverAutoupdate(this.checked)"><span class="switch"></span><span class="label" data-lang="driverAutoupdate">Автообновление драйверов</span></label>
+            </div>
+        </section>
+        <!-- Вкладка Визуальные эффекты -->
+        <section id="visual" class="tab-content">
+            <h2 data-lang="visual">Визуальные эффекты</h2>
+            <p class="description" data-lang="visual-desc">Настройка визуальных эффектов для повышения производительности.</p>
+            <div class="switches">
+                <label class="toggle-switch"><input type="checkbox" id="transparency" onchange="toggleTransparency(this.checked)"><span class="switch"></span><span class="label" data-lang="transparency">Прозрачность</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="bestPerformance" onchange="setBestPerformance(this.checked)"><span class="switch"></span><span class="label" data-lang="bestPerformance">Наилучшая производительность</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="textShadows" onchange="toggleTextShadows(this.checked)"><span class="switch"></span><span class="label" data-lang="textShadows">Тени текста</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="thumbnails" onchange="toggleThumbnailPreviews(this.checked)"><span class="switch"></span><span class="label" data-lang="thumbnails">Превью эскизов</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="animations" onchange="toggleAnimations(this.checked)"><span class="switch"></span><span class="label" data-lang="animations">Анимации</span></label>
+            </div>
+        </section>
+        <!-- Вкладка Конфиденциальность -->
+        <section id="privacy" class="tab-content">
+            <h2 data-lang="privacy">Конфиденциальность</h2>
+            <p class="description" data-lang="privacy-desc">Управление настройками конфиденциальности.</p>
+            <div class="switches">
+                <label class="toggle-switch"><input type="checkbox" id="telemetry" onchange="toggleTelemetry(this.checked)"><span class="switch"></span><span class="label" data-lang="telemetry">Телеметрия Windows</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="officeTelemetry" onchange="toggleOfficeTelemetry(this.checked)"><span class="switch"></span><span class="label" data-lang="officeTelemetry">Телеметрия Office</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="firefoxTelemetry" onchange="toggleFirefoxTelemetry(this.checked)"><span class="switch"></span><span class="label" data-lang="firefoxTelemetry">Телеметрия Firefox</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="chromeTelemetry" onchange="toggleChromeTelemetry(this.checked)"><span class="switch"></span><span class="label" data-lang="chromeTelemetry">Телеметрия Chrome</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="nvidiaTelemetry" onchange="toggleNvidiaTelemetry(this.checked)"><span class="switch"></span><span class="label" data-lang="nvidiaTelemetry">Телеметрия NVIDIA</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="visualStudioTelemetry" onchange="toggleVisualStudioTelemetry(this.checked)"><span class="switch"></span><span class="label" data-lang="visualStudioTelemetry">Телеметрия Visual Studio</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="deviceList" onchange="toggleAppAccessToDeviceList(this.checked)"><span class="switch"></span><span class="label" data-lang="deviceList">Список устройств</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="wirelessSync" onchange="toggleAppSyncWithWireless(this.checked)"><span class="switch"></span><span class="label" data-lang="wirelessSync">Синхронизация с беспроводными</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="analytics" onchange="toggleAppAccessToAnalytics(this.checked)"><span class="switch"></span><span class="label" data-lang="analytics">Аналитика</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="contacts" onchange="toggleAppAccessToContacts(this.checked)"><span class="switch"></span><span class="label" data-lang="contacts">Контакты</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="calendar" onchange="toggleAppAccessToCalendar(this.checked)"><span class="switch"></span><span class="label" data-lang="calendar">Календарь</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="callHistory" onchange="toggleAppAccessToCallHistory(this.checked)"><span class="switch"></span><span class="label" data-lang="callHistory">Журнал вызовов</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="email" onchange="toggleAppAccessToEmail(this.checked)"><span class="switch"></span><span class="label" data-lang="email">Электронная почта</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="tasks" onchange="toggleAppAccessToTasks(this.checked)"><span class="switch"></span><span class="label" data-lang="tasks">Задачи</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="messaging" onchange="toggleAppAccessToMessaging(this.checked)"><span class="switch"></span><span class="label" data-lang="messaging">Сообщения</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="radio" onchange="toggleAppAccessToRadio(this.checked)"><span class="switch"></span><span class="label" data-lang="radio">Радио</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="bluetooth" onchange="toggleAppAccessToBluetooth(this.checked)"><span class="switch"></span><span class="label" data-lang="bluetooth">Bluetooth</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="documents" onchange="toggleAppAccessToDocuments(this.checked)"><span class="switch"></span><span class="label" data-lang="documents">Документы</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="pictures" onchange="toggleAppAccessToPictures(this.checked)"><span class="switch"></span><span class="label" data-lang="pictures">Изображения</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="videos" onchange="toggleAppAccessToVideos(this.checked)"><span class="switch"></span><span class="label" data-lang="videos">Видео</span></label>
+                <label class="toggle-switch"><input type="checkbox" id="filesystem" onchange="toggleAppAccessToFilesystem(this.checked)"><span class="switch"></span><span class="label" data-lang="filesystem">Файловая система</span></label>
+            </div>
+        </section>
+        <!-- Вкладка Питание -->
+        <section id="power" class="tab-content">
+            <h2 data-lang="power">Питание</h2>
+            <p class="description" data-lang="power-desc">Настройка схем управления питанием.</p>
+            <div class="power-options">
+                <label><input type="radio" name="power-plan" id="high-performance" onchange="setHighPerformance(this.checked)"> <span data-lang="high-performance">Высокая производительность</span></label>
+                <label><input type="radio" name="power-plan" id="balanced" onchange="setBalanced(this.checked)"> <span data-lang="balanced">Сбалансированная</span></label>
+                <label><input type="radio" name="power-plan" id="power-saving" onchange="setPowerSaving(this.checked)"> <span data-lang="power-saving">Экономия энергии</span></label>
+            </div>
+        </section>
+        <!-- Вкладка Автозапуск -->
+        <section id="autostart" class="tab-content">
+            <h2 data-lang="autostart">Автозапуск</h2>
+            <p class="description" data-lang="autostart-desc">Управление программами автозапуска.</p>
+            <div id="autostart-list"></div>
+        </section>
+        <!-- Вкладка Система -->
+        <section id="system" class="tab-content">
+            <h2 data-lang="system">Система</h2>
+            <p class="description" data-lang="system-desc">Информация о системе и дополнительные функции.</p>
+            <div class="system-info">
+                <p><strong data-lang="cpu">Процессор:</strong> <span id="cpu-info">Неизвестно</span></p>
+                <p><strong data-lang="ram">Оперативная память:</strong> <span id="ram-info">0 ГБ</span></p>
+                <p><strong data-lang="disk">Диск:</strong> <span id="disk-info">0 ГБ</span></p>
+                <p><strong data-lang="cpu-usage">Использование процессора:</strong> <span id="cpu-usage-info">0%</span></p>
+                <p><strong data-lang="ram-usage">Использование ОЗУ:</strong> <span id="ram-usage-info">0%</span></p>
+                <p><strong data-lang="disk-usage">Использование диска:</strong> <span id="disk-usage-info">0%</span></p>
+                <p><strong data-lang="gpu">Видеокарта:</strong> <span id="gpu-info">Неизвестно</span></p>
+                <p><strong data-lang="gpu-usage">Использование видеокарты:</strong> <span id="gpu-usage-info">0%</span></p>
+                <p><strong data-lang="gpu-memory">Память видеокарты:</strong> <span id="gpu-memory-info">0/0 ГБ</span></p>
+                <p><strong data-lang="cpu-temp">Температура процессора:</strong> <span id="cpu-temp-info">Н/Д</span></p>
+                <p><strong data-lang="gpu-temp">Температура видеокарты:</strong> <span id="gpu-temp-info">Н/Д</span></p>
+            </div>
+            <div class="system-actions">
+                <button onclick="createRestorePoint()" data-lang="create-restore-point">Создать точку восстановления</button>
+                <button onclick="optimizeSystem()" data-lang="optimize-system">Оптимизировать систему</button>
+                <button onclick="restartExplorer()" data-lang="restart-explorer">Перезапустить проводник</button>
+                <button onclick="activateWindows()" data-lang="activate-windows">Активировать Windows</button>
+            </div>
+        </section>
+        <!-- Вкладка Профили -->
+        <section id="profiles" class="tab-content">
+            <h2 data-lang="profiles">Профили</h2>
+            <p class="description" data-lang="profiles-desc">Сохранение и загрузка профилей настроек.</p>
+            <div class="profile-controls">
+                <input type="text" id="profile-name" placeholder="Имя профиля" data-lang-placeholder="profile-name">
+                <button onclick="saveProfile()" data-lang="save-profile">Сохранить профиль</button>
+                <select id="profile-select">
+                    <option value="" disabled selected data-lang="select-profile">Выберите профиль</option>
+                </select>
+                <button onclick="loadProfile()" data-lang="load-profile">Загрузить профиль</button>
+            </div>
+        </section>
+    </main>
+    <script src="eel.js"></script>
+    <script src="translations.js"></script>
+    <script>
+        let cpuChart, ramChart, gpuChart;
+
+        async function initState() {
+            try {
+                const state = await eel.get_system_state()();
+                if (!state) {
+                    setStatus("Ошибка загрузки состояния системы", true);
+                    return;
+                }
+
+                for (const [key, value] of Object.entries(state)) {
+                    const element = document.getElementById(key);
+                    if (element && element.type === "checkbox") {
+                        element.checked = value;
+                    }
+                }
+
+                document.getElementById("high-performance").checked = state.power_plan === "high";
+                document.getElementById("balanced").checked = state.power_plan === "balanced";
+                document.getElementById("power-saving").checked = state.power_plan === "power_saving";
+
+                const languageSelect = document.getElementById("language-select");
+                languageSelect.value = state.language || "ru";
+                updateLanguage(state.language);
+
+                updateAutostartList();
+                updateProfileList();
+                updateSystemInfo();
+            } catch (e) {
+                console.error("Ошибка инициализации состояния:", e);
+                setStatus("Ошибка инициализации: " + e, true);
+            }
+        }
+
+        async function updateSystemInfo() {
+            try {
+                const info = await eel.get_system_info()();
+                if (!info) {
+                    setStatus("Ошибка получения системной информации", true);
+                    return;
+                }
+
+                document.getElementById("cpu-info").textContent = info.cpu;
+                document.getElementById("ram-info").textContent = `${info.ram} ГБ`;
+                document.getElementById("disk-info").textContent = `${info.disk} ГБ`;
+                document.getElementById("cpu-usage-info").textContent = `${info.cpu_usage}%`;
+                document.getElementById("ram-usage-info").textContent = `${info.ram_usage}%`;
+                document.getElementById("disk-usage-info").textContent = `${info.disk_usage}%`;
+                document.getElementById("gpu-info").textContent = info.gpu_name;
+                document.getElementById("gpu-usage-info").textContent = `${info.gpu_usage}%`;
+                document.getElementById("gpu-memory-info").textContent = `${info.gpu_memory_used}/${info.gpu_memory_total} ГБ`;
+                document.getElementById("cpu-temp-info").textContent = info.cpu_temp === "Н/Д" ? "Н/Д" : `${info.cpu_temp}°C`;
+                document.getElementById("gpu-temp-info").textContent = info.gpu_temp === "Н/Д" ? "Н/Д" : `${info.gpu_temp}°C`;
+            } catch (e) {
+                console.error("Ошибка обновления системной информации:", e);
+                setStatus("Ошибка системной информации: " + e, true);
+            }
+        }
+
+        async function updateAutostartList() {
+            try {
+                const programs = await eel.get_autostart_programs()();
+                const list = document.getElementById("autostart-list");
+                list.innerHTML = "";
+                programs.forEach(program => {
+                    const div = document.createElement("div");
+                    div.className = "toggle-switch";
+                    div.innerHTML = `
+                        <input type="checkbox" id="autostart-${program.name}" ${program.enabled ? "checked" : ""} onchange="toggleAutostart('${program.name}', this.checked)">
+                        <span class="switch"></span>
+                        <span class="label">${program.name} (${program.path})</span>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                console.error("Ошибка обновления списка автозапуска:", e);
+                setStatus("Ошибка автозапуска: " + e, true);
+            }
+        }
+
+        async function updateProfileList() {
+            try {
+                const profiles = await eel.get_profiles()();
+                const select = document.getElementById("profile-select");
+                select.innerHTML = '<option value="" disabled selected data-lang="select-profile">Выберите профиль</option>';
+                profiles.forEach(profile => {
+                    const option = document.createElement("option");
+                    option.value = profile;
+                    option.textContent = profile;
+                    select.appendChild(option);
+                });
+                updateLanguage(document.getElementById("language-select").value);
+            } catch (e) {
+                console.error("Ошибка обновления списка профилей:", e);
+                setStatus("Ошибка профилей: " + e, true);
+            }
+        }
+
+        function setStatus(message, isError = false) {
+            const status = document.getElementById("status");
+            status.textContent = message;
+            status.className = isError ? "error" : "";
+            eel.play_click_sound();
+        }
+
+        async function toggleCortana(enabled) {
+            try {
+                const result = await eel.toggle_cortana(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка Cortana: " + e, true);
+            }
+        }
+
+        async function toggleGameMode(enabled) {
+            try {
+                const result = await eel.toggle_game_mode(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка игрового режима: " + e, true);
+            }
+        }
+
+        async function toggleGameBar(enabled) {
+            try {
+                const result = await eel.toggle_game_bar(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка игровой панели: " + e, true);
+            }
+        }
+
+        async function toggleWindowsUpdate(enabled) {
+            try {
+                const result = await eel.toggle_windows_update(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка обновлений: " + e, true);
+            }
+        }
+
+        async function toggleTouchInput(enabled) {
+            try {
+                const result = await eel.toggle_touch_input(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка сенсорного ввода: " + e, true);
+            }
+        }
+
+        async function toggleCloudClipboard(enabled) {
+            try {
+                const result = await eel.toggle_cloud_clipboard(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка облачного буфера: " + e, true);
+            }
+        }
+
+        async function toggleStickyKeys(enabled) {
+            try {
+                const result = await eel.toggle_sticky_keys(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка залипания клавиш: " + e, true);
+            }
+        }
+
+        async function toggleMenuDelay(enabled) {
+            try {
+                const result = await eel.toggle_menu_delay(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка задержки меню: " + e, true);
+            }
+        }
+
+        async function toggleSmartScreen(enabled) {
+            try {
+                const result = await eel.toggle_smart_screen(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка Smart Screen: " + e, true);
+            }
+        }
+
+        async function toggleMouseAcceleration(enabled) {
+            try {
+                const result = await eel.toggle_mouse_acceleration(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка акселерации мыши: " + e, true);
+            }
+        }
+
+        async function toggleProtectionNotifications(enabled) {
+            try {
+                const result = await eel.toggle_protection_notifications(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка уведомлений защиты: " + e, true);
+            }
+        }
+
+        async function toggleTransparency(enabled) {
+            try {
+                const result = await eel.toggle_transparency(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка прозрачности: " + e, true);
+            }
+        }
+
+        async function setBestPerformance(enabled) {
+            try {
+                const result = await eel.set_best_performance(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка производительности: " + e, true);
+            }
+        }
+
+        async function toggleTextShadows(enabled) {
+            try {
+                const result = await eel.toggle_text_shadows(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка теней текста: " + e, true);
+            }
+        }
+
+        async function toggleThumbnailPreviews(enabled) {
+            try {
+                const result = await eel.toggle_thumbnail_previews(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка эскизов: " + e, true);
+            }
+        }
+
+        async function toggleAnimations(enabled) {
+            try {
+                const result = await eel.toggle_animations(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка анимаций: " + e, true);
+            }
+        }
+
+        async function toggleUnnecessaryServices(enabled) {
+            try {
+                const result = await eel.toggle_unnecessary_services(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка служб: " + e, true);
+            }
+        }
+
+        async function toggleDriverAutoupdate(enabled) {
+            try {
+                const result = await eel.toggle_driver_autoupdate(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка автообновления драйверов: " + e, true);
+            }
+        }
+
+        async function toggleTelemetry(enabled) {
+            try {
+                const result = await eel.toggle_telemetry(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка телеметрии: " + e, true);
+            }
+        }
+
+        async function toggleOfficeTelemetry(enabled) {
+            try {
+                const result = await eel.toggle_office_telemetry(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка телеметрии Office: " + e, true);
+            }
+        }
+
+        async function toggleFirefoxTelemetry(enabled) {
+            try {
+                const result = await eel.toggle_firefox_telemetry(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка телеметрии Firefox: " + e, true);
+            }
+        }
+
+        async function toggleChromeTelemetry(enabled) {
+            try {
+                const result = await eel.toggle_chrome_telemetry(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка телеметрии Chrome: " + e, true);
+            }
+        }
+
+        async function toggleNvidiaTelemetry(enabled) {
+            try {
+                const result = await eel.toggle_nvidia_telemetry(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка телеметрии NVIDIA: " + e, true);
+            }
+        }
+
+        async function toggleVisualStudioTelemetry(enabled) {
+            try {
+                const result = await eel.toggle_visualstudio_telemetry(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка телеметрии Visual Studio: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToDeviceList(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_device_list(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка списка устройств: " + e, true);
+            }
+        }
+
+        async function toggleAppSyncWithWireless(enabled) {
+            try {
+                const result = await eel.toggle_app_sync_with_wireless(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка синхронизации: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToAnalytics(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_analytics(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка аналитики: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToContacts(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_contacts(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка контактов: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToCalendar(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_calendar(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка календаря: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToCallHistory(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_call_history(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка журнала вызовов: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToEmail(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_email(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка электронной почты: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToTasks(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_tasks(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка задач: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToMessaging(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_messaging(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка сообщений: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToRadio(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_radio(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка радио: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToBluetooth(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_bluetooth(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка Bluetooth: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToDocuments(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_documents(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка документов: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToPictures(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_pictures(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка изображений: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToVideos(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_videos(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка видео: " + e, true);
+            }
+        }
+
+        async function toggleAppAccessToFilesystem(enabled) {
+            try {
+                const result = await eel.toggle_app_access_to_filesystem(enabled)();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка файловой системы: " + e, true);
+            }
+        }
+
+        async function toggleAutostart(name, enabled) {
+            try {
+                const result = await eel.toggle_autostart(name, enabled)();
+                setStatus(result, result.includes("Ошибка"));
+                updateAutostartList();
+            } catch (e) {
+                setStatus("Ошибка автозапуска: " + e, true);
+            }
+        }
+
+        async function createRestorePoint() {
+            try {
+                const result = await eel.create_restore_point()();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка точки восстановления: " + e, true);
+            }
+        }
+
+        async function optimizeSystem() {
+            try {
+                const result = await eel.optimize_system()();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка оптимизации: " + e, true);
+            }
+        }
+
+        async function restartExplorer() {
+            try {
+                const result = await eel.restart_explorer()();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка перезапуска проводника: " + e, true);
+            }
+        }
+
+        async function activateWindows() {
+            try {
+                const result = await eel.activate_windows()();
+                setStatus(result, result.includes("Ошибка"));
+            } catch (e) {
+                setStatus("Ошибка активации Windows: " + e, true);
+            }
+        }
+
+        async function saveProfile() {
+            try {
+                const name = document.getElementById("profile-name").value.trim();
+                if (!name) {
+                    setStatus("Введите имя профиля", true);
+                    return;
+                }
+                const result = await eel.save_profile(name)();
+                setStatus(result, result.includes("Ошибка"));
+                updateProfileList();
+                document.getElementById("profile-name").value = "";
+            } catch (e) {
+                setStatus("Ошибка сохранения профиля: " + e, true);
+            }
+        }
+
+        async function loadProfile() {
+            try {
+                const name = document.getElementById("profile-select").value;
+                if (!name) {
+                    setStatus("Выберите профиль", true);
+                    return;
+                }
+                const result = await eel.load_profile(name)();
+                setStatus(result, result.includes("Ошибка"));
+                initState();
+            } catch (e) {
+                setStatus("Ошибка загрузки профиля: " + e, true);
+            }
+        }
+
+        async function setHighPerformance(enabled) {
+            if (enabled) {
+                try {
+                    const result = await eel.set_high_performance(true)();
+                    setStatus(result, result.includes("Ошибка"));
+                } catch (e) {
+                    setStatus("Ошибка высокой производительности: " + e, true);
+                }
+            }
+        }
+
+        async function setBalanced(enabled) {
+            if (enabled) {
+                try {
+                    const result = await eel.set_balanced(true)();
+                    setStatus(result, result.includes("Ошибка"));
+                } catch (e) {
+                    setStatus("Ошибка сбалансированной схемы: " + e, true);
+                }
+            }
+        }
+
+        async function setPowerSaving(enabled) {
+            if (enabled) {
+                try {
+                    const result = await eel.set_power_saving(true)();
+                    setStatus(result, result.includes("Ошибка"));
+                } catch (e) {
+                    setStatus("Ошибка экономии энергии: " + e, true);
+                }
+            }
+        }
+
+        function initCharts() {
+            cpuChart = new Chart(document.getElementById("cpuChart"), {
+                type: "line",
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: "CPU Usage (%)",
+                        data: [],
+                        borderColor: "#007bff",
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+
+            ramChart = new Chart(document.getElementById("ramChart"), {
+                type: "line",
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: "RAM Usage (GB)",
+                        data: [],
+                        borderColor: "#28a745",
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            gpuChart = new Chart(document.getElementById("gpuChart"), {
+                type: "line",
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: "GPU Usage (%)",
+                        data: [],
+                        borderColor: "#dc3545",
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+        }
+
+        async function updateCharts() {
+            try {
+                const stats = await eel.get_system_stats()();
+                const now = new Date().toLocaleTimeString();
+
+                cpuChart.data.labels.push(now);
+                cpuChart.data.datasets[0].data.push(stats.cpu_usage);
+                ramChart.data.labels.push(now);
+                ramChart.data.datasets[0].data.push(stats.ram_used);
+                gpuChart.data.labels.push(now);
+                gpuChart.data.datasets[0].data.push(stats.gpu_usage);
+
+                if (cpuChart.data.labels.length > 20) {
+                    cpuChart.data.labels.shift();
+                    cpuChart.data.datasets[0].data.shift();
+                    ramChart.data.labels.shift();
+                    ramChart.data.datasets[0].data.shift();
+                    gpuChart.data.labels.shift();
+                    gpuChart.data.datasets[0].data.shift();
+                }
+
+                cpuChart.update();
+                ramChart.update();
+                gpuChart.update();
+            } catch (e) {
+                console.error("Ошибка обновления графиков:", e);
+            }
+        }
+
+        async function updatePerformance() {
+            try {
+                const score = await eel.get_performance_score()();
+                const status = document.getElementById("performance-status");
+                document.getElementById("performance-score").textContent = translations[document.getElementById("language-select").value]["performance-score"] + ": " + score;
+                
+                if (score > 80) {
+                    status.textContent = translations[document.getElementById("language-select").value]["excellent"];
+                    status.className = "excellent";
+                } else if (score > 60) {
+                    status.textContent = translations[document.getElementById("language-select").value]["good"];
+                    status.className = "good";
+                } else if (score > 40) {
+                    status.textContent = translations[document.getElementById("language-select").value]["average"];
+                    status.className = "average";
+                } else {
+                    status.textContent = translations[document.getElementById("language-select").value]["poor"];
+                    status.className = "poor";
+                }
+            } catch (e) {
+                console.error("Ошибка обновления производительности:", e);
+            }
+        }
+
+        document.querySelectorAll(".tab-button").forEach(button => {
+            button.addEventListener("click", () => {
+                document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+                document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
+                button.classList.add("active");
+                document.getElementById(button.dataset.tab).classList.add("active");
+                eel.play_click_sound();
+            });
+        });
+
+        document.getElementById("theme-toggle").addEventListener("change", (e) => {
+            const theme = e.target.value;
+            document.getElementById("theme-stylesheet").href = theme === "dark" ? "style.css" : "style_light.css";
+            particlesJS.load("particles-js", theme === "dark" ? "particles.json" : "particles_light.json");
+            eel.play_click_sound();
+        });
+
+        document.getElementById("language-select").addEventListener("change", async (e) => {
+            const lang = e.target.value;
+            await eel.set_language(lang)();
+            updateLanguage(lang);
+            eel.play_click_sound();
+        });
+
+        window.addEventListener("load", async () => {
+            initCharts();
+            initState();
+            updatePerformance();
+            setInterval(updateCharts, 2000);
+            setInterval(updatePerformance, 5000);
+
+            particlesJS.load("particles-js", document.getElementById("theme-toggle").value === "dark" ? "particles.json" : "particles_light.json");
+        });
+    </script>
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "your-token-here"}'></script>
+</body>
+</html>
