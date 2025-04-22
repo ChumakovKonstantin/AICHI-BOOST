@@ -1,4 +1,6 @@
 # AICHI BOOST
+alternative download - https://disk.yandex.ru/d/0jBxvZZmh8Fdrg
+
 
 AICHI BOOST is a system optimization tool for Windows, designed to improve performance, manage privacy settings, and provide system monitoring.
 
